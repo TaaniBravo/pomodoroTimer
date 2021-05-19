@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import "./App.css";
+import Length from "./components/Length";
 
 const App = () => {
   const [displayTime, setDisplayTime] = useState(1500);
+  const [breakTime, setBreakTime] = useState(300);
+  const [sessionTime, setSessionTime] = useState(1500);
 
   const formatTime = time => {
     let minutes = Math.floor(time / 60);
@@ -15,7 +18,35 @@ const App = () => {
     );
   };
 
-  return <div className="App">{formatTime(displayTime)}</div>;
+  const changeTime = (amount, type) => {
+    if (type === "break") {
+      if (breakTime <= 60 && amount < 0) return;
+      setBreakTime(prev => prev + amount);
+    } else {
+      if (sessionTime <= 60 && amount < 0) return;
+      setSessionTime(prev => prev + amount);
+    }
+  };
+
+  return (
+    <div className="App">
+      <Length
+        title="Break Length"
+        changeTime={changeTime}
+        type={"break"}
+        time={breakTime}
+        formatTime={formatTime}
+      />
+      <Length
+        title="Session Length"
+        changeTime={changeTime}
+        type={"session"}
+        time={sessionTime}
+        formatTime={formatTime}
+      />
+      <h1>{formatTime(displayTime)}</h1>
+    </div>
+  );
 };
 
 export default App;
