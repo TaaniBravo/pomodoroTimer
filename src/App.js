@@ -6,6 +6,7 @@ const App = () => {
   const [displayTime, setDisplayTime] = useState(1500);
   const [breakTime, setBreakTime] = useState(300);
   const [sessionTime, setSessionTime] = useState(1500);
+  const [timerOn, setTimerOn] = useState(false);
 
   const formatTime = time => {
     let minutes = Math.floor(time / 60);
@@ -18,6 +19,10 @@ const App = () => {
     );
   };
 
+  const formatLengthTimes = time => {
+    return time / 60;
+  };
+
   const changeTime = (amount, type) => {
     if (type === "break") {
       if (breakTime <= 60 && amount < 0) return;
@@ -25,25 +30,31 @@ const App = () => {
     } else {
       if (sessionTime <= 60 && amount < 0) return;
       setSessionTime(prev => prev + amount);
+      if (!timerOn) setDisplayTime(sessionTime + amount);
     }
   };
 
   return (
     <div className="App">
-      <Length
-        title="Break Length"
-        changeTime={changeTime}
-        type={"break"}
-        time={breakTime}
-        formatTime={formatTime}
-      />
-      <Length
-        title="Session Length"
-        changeTime={changeTime}
-        type={"session"}
-        time={sessionTime}
-        formatTime={formatTime}
-      />
+      <h1>Pomodoro Clock</h1>
+      <div className="length-container">
+        <Length
+          title="Break Length"
+          changeTime={changeTime}
+          type={"break"}
+          time={breakTime}
+          formatTime={formatTime}
+          formatLengthTimes={formatLengthTimes}
+        />
+        <Length
+          title="Session Length"
+          changeTime={changeTime}
+          type={"session"}
+          time={sessionTime}
+          formatTime={formatTime}
+          formatLengthTimes={formatLengthTimes}
+        />
+      </div>
       <h1>{formatTime(displayTime)}</h1>
     </div>
   );
