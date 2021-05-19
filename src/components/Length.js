@@ -1,13 +1,17 @@
 import React from "react";
 
-const Length = ({ title, changeTime, type, time, formatLengthTimes }) => {
+const Length = ({ id, title, changeTime, type, time, formatLengthTimes }) => {
   return (
     <div>
-      <h3>{title}</h3>
+      <h3 id={id}>{title}</h3>
       <div>
-        <button onClick={() => changeTime(-60, type)}>Down</button>
-        <h3>{formatLengthTimes(time)}</h3>
-        <button onClick={() => changeTime(60, type)}>Up</button>
+        <button id={type + "-decrement"} onClick={() => changeTime(-60, type)}>
+          Down
+        </button>
+        <h3 id={type + "-length"}>{formatLengthTimes(time)}</h3>
+        <button id={type + "-increment"} onClick={() => changeTime(60, type)}>
+          Up
+        </button>
       </div>
     </div>
   );

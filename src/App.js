@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import "./App.css";
 import Length from "./components/Length";
+import djHorn from "./djsoundeffect.mp3";
 
 const App = () => {
   const [displayTime, setDisplayTime] = useState(1500);
   const [breakTime, setBreakTime] = useState(300);
   const [sessionTime, setSessionTime] = useState(1500);
   const [timerOn, setTimerOn] = useState(false);
+  const [onBreak, setOnBreak] = useState(false);
+  const [alarm, setAlarm] = useState(new Audio(djHorn));
+
+  const playAlarm = () => {
+    alarm.currentTime = 0;
+    alarm.play();
+  };
 
   const formatTime = time => {
     let minutes = Math.floor(time / 60);
@@ -29,9 +37,58 @@ const App = () => {
       setBreakTime(prev => prev + amount);
     } else {
       if (sessionTime <= 60 && amount < 0) return;
+      if (sessionTime >= 60 * 60 && amount > 0) return;
       setSessionTime(prev => prev + amount);
       if (!timerOn) setDisplayTime(sessionTime + amount);
     }
+  };
+
+  const controlTime = () => {
+    let second = 1000;
+    let date = new Date().getTime();
+    let nextDate = new Date().getTime() + second;
+    // let onBreakVariable = onBreak;
+
+    if (!timerOn) {
+      let interval = setInterval(() => {
+        date = new Date().getTime();
+        if (date > nextDate) {
+          setDisplayTime(prev => {
+            if (prev <= 0 && !onBreak) {
+              playAlarm();
+              // onBreakVariable = true;
+              setOnBreak(true);
+              return breakTime;
+            } else if (prev <= 0 && onBreak) {
+              console.log("in the session universe");
+              playAlarm();
+              // onBreakVariable = false;
+              setOnBreak(false);
+              resetTime();
+              return sessionTime;
+            }
+            return prev - 1;
+          });
+
+          nextDate += second;
+        }
+      }, 30);
+
+      localStorage.clear();
+      localStorage.setItem("interval-id", interval);
+    }
+
+    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
+
+    setTimerOn(!timerOn);
+  };
+
+  const resetTime = () => {
+    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
+
+    setDisplayTime(1500);
+    setBreakTime(300);
+    setSessionTime(1500);
   };
 
   return (
@@ -39,6 +96,7 @@ const App = () => {
       <h1>Pomodoro Clock</h1>
       <div className="length-container">
         <Length
+          id={"break-label"}
           title="Break Length"
           changeTime={changeTime}
           type={"break"}
@@ -47,6 +105,7 @@ const App = () => {
           formatLengthTimes={formatLengthTimes}
         />
         <Length
+          id={"session-label"}
           title="Session Length"
           changeTime={changeTime}
           type={"session"}
@@ -55,7 +114,14 @@ const App = () => {
           formatLengthTimes={formatLengthTimes}
         />
       </div>
-      <h1>{formatTime(displayTime)}</h1>
+      <h2 id="timer-label">{onBreak ? "Break" : "Session"}</h2>
+      <h1 id="time-left">{formatTime(displayTime)}</h1>
+      <button id="start_stop" onClick={controlTime}>
+        {timerOn ? "Pause" : "Play"}
+      </button>
+      <button id="reset" onClick={resetTime}>
+        Reset
+      </button>
     </div>
   );
 };
