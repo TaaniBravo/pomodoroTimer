@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import "./App.css";
+import "./App.scss";
 import Length from "./components/Length";
 import djHorn from "./djsoundeffect.mp3";
+import { Container } from "react-bootstrap";
 
 const App = () => {
   const [displayTime, setDisplayTime] = useState(1500);
@@ -99,36 +100,44 @@ const App = () => {
 
   return (
     <div className="App">
-      <h1>Pomodoro Clock</h1>
-      <div className="length-container">
-        <Length
-          id={"break-label"}
-          title="Break Length"
-          changeTime={changeTime}
-          type={"break"}
-          time={breakTime}
-          formatTime={formatTime}
-          formatLengthTimes={formatLengthTimes}
-        />
-        <Length
-          id={"session-label"}
-          title="Session Length"
-          changeTime={changeTime}
-          type={"session"}
-          time={sessionTime}
-          formatTime={formatTime}
-          formatLengthTimes={formatLengthTimes}
-        />
-      </div>
-      <h2 id="timer-label">{onBreak ? "Break" : "Session"}</h2>
-      <h1 id="time-left">{formatTime(displayTime)}</h1>
-      <button id="start_stop" onClick={controlTime}>
-        {timerOn ? "Pause" : "Play"}
-      </button>
-      <button id="reset" onClick={resetTime}>
-        Reset
-      </button>
-      <audio id="beep" src={djHorn}></audio>
+      <Container>
+        <h1>Pomodoro Clock</h1>
+        <div className="length-container">
+          <Length
+            id={"break-label"}
+            title="Break Length"
+            changeTime={changeTime}
+            type={"break"}
+            time={breakTime}
+            formatTime={formatTime}
+            formatLengthTimes={formatLengthTimes}
+          />
+          <Length
+            id={"session-label"}
+            title="Session Length"
+            changeTime={changeTime}
+            type={"session"}
+            time={sessionTime}
+            formatTime={formatTime}
+            formatLengthTimes={formatLengthTimes}
+          />
+        </div>
+        <h2 id="timer-label">{onBreak ? "Break" : "Session"}</h2>
+        <h1 id="time-left">{formatTime(displayTime)}</h1>
+        <button id="start_stop" onClick={controlTime}>
+          {timerOn ? (
+            <i class="fas fa-pause-circle"></i>
+          ) : (
+            <i class="fas fa-play-circle"></i>
+          )}
+        </button>
+        <button id="reset" onClick={resetTime}>
+          <i class="fas fa-history"></i>
+        </button>
+        <audio id="beep" src={djHorn}></audio>
+      </Container>
+
+      <footer>Created By Taanileka Maama</footer>
     </div>
   );
 };
