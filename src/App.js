@@ -4,9 +4,9 @@ import Length from "./components/Length";
 import djHorn from "./djsoundeffect.mp3";
 
 const App = () => {
-  const [displayTime, setDisplayTime] = useState(1500);
-  const [breakTime, setBreakTime] = useState(300);
-  const [sessionTime, setSessionTime] = useState(1500);
+  const [displayTime, setDisplayTime] = useState(3);
+  const [breakTime, setBreakTime] = useState(3);
+  const [sessionTime, setSessionTime] = useState(3);
   const [timerOn, setTimerOn] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
   const [alarm, setAlarm] = useState(new Audio(djHorn));
@@ -34,6 +34,7 @@ const App = () => {
   const changeTime = (amount, type) => {
     if (type === "break") {
       if (breakTime <= 60 && amount < 0) return;
+      if (breakTime >= 60 * 60 && amount > 0) return;
       setBreakTime(prev => prev + amount);
     } else {
       if (sessionTime <= 60 && amount < 0) return;
@@ -58,17 +59,22 @@ const App = () => {
               playAlarm();
               // onBreakVariable = true;
               setOnBreak(true);
+              date = new Date().getTime();
               return breakTime;
             } else if (prev <= 0 && onBreak) {
-              console.log("in the session universe");
+              console.log("Should be switching away from the break", onBreak);
               playAlarm();
               // onBreakVariable = false;
               setOnBreak(false);
               resetTime();
               return sessionTime;
             }
+
             return prev - 1;
           });
+
+          console.log("Next Date: ", nextDate);
+          console.log("Date: ", date);
 
           nextDate += second;
         }
@@ -85,7 +91,7 @@ const App = () => {
 
   const resetTime = () => {
     if (timerOn) clearInterval(localStorage.getItem("interval-id"));
-
+    console.log("Hello after your break.");
     setDisplayTime(1500);
     setBreakTime(300);
     setSessionTime(1500);
@@ -122,6 +128,7 @@ const App = () => {
       <button id="reset" onClick={resetTime}>
         Reset
       </button>
+      <audio id="beep" src={djHorn}></audio>
     </div>
   );
 };
