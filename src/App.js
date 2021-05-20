@@ -4,15 +4,14 @@ import Length from "./components/Length";
 import djHorn from "./djsoundeffect.mp3";
 
 const App = () => {
-  const [displayTime, setDisplayTime] = useState(3);
-  const [breakTime, setBreakTime] = useState(3);
-  const [sessionTime, setSessionTime] = useState(3);
+  const [displayTime, setDisplayTime] = useState(1500);
+  const [breakTime, setBreakTime] = useState(300);
+  const [sessionTime, setSessionTime] = useState(1500);
   const [timerOn, setTimerOn] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
-  const [alarm, setAlarm] = useState(new Audio(djHorn));
+  const alarm = document.getElementById("beep");
 
   const playAlarm = () => {
-    alarm.currentTime = 0;
     alarm.play();
   };
 
@@ -48,23 +47,26 @@ const App = () => {
     let second = 1000;
     let date = new Date().getTime();
     let nextDate = new Date().getTime() + second;
-    // let onBreakVariable = onBreak;
+    let onBreakVariable = onBreak;
+
+    console.log(timerOn);
 
     if (!timerOn) {
       let interval = setInterval(() => {
         date = new Date().getTime();
         if (date > nextDate) {
           setDisplayTime(prev => {
-            if (prev <= 0 && !onBreak) {
+            if (prev === 0 && !onBreakVariable) {
               playAlarm();
-              // onBreakVariable = true;
               setOnBreak(true);
-              date = new Date().getTime();
+              // console.log("Date in interval: ", date);
+              setTimeout(() => {
+                onBreakVariable = true;
+              }, 50);
               return breakTime;
-            } else if (prev <= 0 && onBreak) {
-              console.log("Should be switching away from the break", onBreak);
+            } else if (prev === 0 && onBreakVariable) {
               playAlarm();
-              // onBreakVariable = false;
+              onBreakVariable = false;
               setOnBreak(false);
               resetTime();
               return sessionTime;
@@ -72,9 +74,6 @@ const App = () => {
 
             return prev - 1;
           });
-
-          console.log("Next Date: ", nextDate);
-          console.log("Date: ", date);
 
           nextDate += second;
         }
@@ -91,7 +90,8 @@ const App = () => {
 
   const resetTime = () => {
     if (timerOn) clearInterval(localStorage.getItem("interval-id"));
-    console.log("Hello after your break.");
+    setOnBreak(false);
+    setTimerOn(false);
     setDisplayTime(1500);
     setBreakTime(300);
     setSessionTime(1500);
