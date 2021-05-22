@@ -4,6 +4,8 @@ import Length from "./components/Length";
 import djHorn from "./djsoundeffect.mp3";
 import { Container } from "react-bootstrap";
 
+// Current issue is that the timer is for some reason not resetting to session timer after the break timer finishes.
+
 const App = () => {
   const [displayTime, setDisplayTime] = useState(1500);
   const [breakTime, setBreakTime] = useState(300);
@@ -50,26 +52,27 @@ const App = () => {
     let nextDate = new Date().getTime() + second;
     let onBreakVariable = onBreak;
 
-    console.log(timerOn);
-
     if (!timerOn) {
       let interval = setInterval(() => {
         date = new Date().getTime();
         if (date > nextDate) {
           setDisplayTime(prev => {
-            if (prev === 0 && !onBreakVariable) {
+            console.log(onBreakVariable);
+            console.log(prev);
+            if (prev <= 0 && !onBreakVariable) {
               playAlarm();
               setOnBreak(true);
-              // console.log("Date in interval: ", date);
               setTimeout(() => {
                 onBreakVariable = true;
-              }, 50);
+              }, 20);
               return breakTime;
-            } else if (prev === 0 && onBreakVariable) {
+            } else if (prev <= 0 && onBreakVariable) {
+              console.log("Making into if statement");
               playAlarm();
-              onBreakVariable = false;
               setOnBreak(false);
-              resetTime();
+              setTimeout(() => {
+                onBreakVariable = false;
+              }, 100);
               return sessionTime;
             }
 
@@ -85,14 +88,13 @@ const App = () => {
     }
 
     if (timerOn) clearInterval(localStorage.getItem("interval-id"));
-
     setTimerOn(!timerOn);
   };
 
   const resetTime = () => {
     if (timerOn) clearInterval(localStorage.getItem("interval-id"));
+
     setOnBreak(false);
-    setTimerOn(false);
     setDisplayTime(1500);
     setBreakTime(300);
     setSessionTime(1500);
