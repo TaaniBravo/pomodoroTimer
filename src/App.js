@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./App.scss";
 import Length from "./components/Length";
 import djHorn from "./djsoundeffect.mp3";
@@ -10,10 +10,10 @@ const App = () => {
   const [sessionTime, setSessionTime] = useState(1500);
   const [timerOn, setTimerOn] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
-  const alarm = document.getElementById("beep");
+  const alarm = useRef();
 
   const playAlarm = () => {
-    alarm.play();
+    alarm.current.play();
   };
 
   const formatTime = time => {
@@ -134,7 +134,7 @@ const App = () => {
         <button id="reset" onClick={resetTime}>
           <i class="fas fa-history"></i>
         </button>
-        <audio id="beep" src={djHorn}></audio>
+        <audio id="beep" ref={alarm} src={djHorn}></audio>
       </Container>
 
       <footer>Created By Taanileka Maama</footer>
