@@ -7,20 +7,19 @@ import { Container } from "react-bootstrap";
 // Current issue is that the timer is for some reason not resetting to session timer after the break timer finishes.
 
 const App = () => {
-  const [displayTime, setDisplayTime] = useState(1500);
-  const [breakTime, setBreakTime] = useState(300);
-  const [sessionTime, setSessionTime] = useState(1500);
+  const [displayTime, setDisplayTime] = useState(5);
+  const [breakTime, setBreakTime] = useState(2);
+  const [sessionTime, setSessionTime] = useState(4);
   const [timerOn, setTimerOn] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
   const alarm = useRef();
 
-  const playAlarm = () => {
-    alarm.current.play();
-  };
-
   const formatTime = time => {
     let minutes = Math.floor(time / 60);
     let seconds = time % 60;
+
+    if (minutes < 0) minutes = 0;
+    if (seconds < 0) seconds = 0;
 
     return (
       (minutes < 10 ? "0" + minutes : minutes) +
@@ -48,46 +47,61 @@ const App = () => {
 
   const controlTime = () => {
     let second = 1000;
-    let date = new Date().getTime();
-    let nextDate = new Date().getTime() + second;
+    // let date = new Date().getTime();
+    // let nextDate = new Date().getTime() + second;
     let onBreakVariable = onBreak;
 
+    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
+
+    // IF timer is off then...
     if (!timerOn) {
+      // Define our interval so we can store it.
       let interval = setInterval(() => {
-        date = new Date().getTime();
-        if (date > nextDate) {
+        // Assign our date again to a new time.
+        // date = new Date().getTime();
+        // If the date is still larger then the nextDate variable we are setting the displayTime to adjust for that 1 second change on the timer.
+
+        if (displayTime >= 0) {
           setDisplayTime(prev => {
-            console.log(onBreakVariable);
-            console.log(prev);
+            // IF the prev time is at 0 and onBreakVariable is false then...
             if (prev <= 0 && !onBreakVariable) {
-              playAlarm();
+              alarm.current.play();
               setOnBreak(true);
+
+              // setTimeout helps with delay the onBreakVariable so that the if statement is not exited early.
               setTimeout(() => {
                 onBreakVariable = true;
-              }, 20);
+              }, 5);
+
+              // RETURN our break time.
               return breakTime;
+
+              // ELSE IF the prev timer is at 0 and onBreakVariable is true then...
             } else if (prev <= 0 && onBreakVariable) {
-              console.log("Making into if statement");
-              playAlarm();
+              alarm.current.play();
               setOnBreak(false);
+
+              // Same as the above setTimeout function.
               setTimeout(() => {
                 onBreakVariable = false;
-              }, 100);
+              }, 5);
+              // RETURN our session time.
               return sessionTime;
             }
 
             return prev - 1;
           });
 
-          nextDate += second;
+          // IF neither of the IF statements fit then we are return the nextDate plus 1000ms.
+          // nextDate += second;
         }
-      }, 30);
+      }, second);
 
+      // We are clearing and then storing our interval so that we can call upon it easily when we want to pause the timer.
       localStorage.clear();
       localStorage.setItem("interval-id", interval);
     }
 
-    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
     setTimerOn(!timerOn);
   };
 
