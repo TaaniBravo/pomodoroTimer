@@ -46,12 +46,10 @@ const App = () => {
   };
 
   const controlTime = () => {
-    let second = 1000;
+    let second = 1020;
     // let date = new Date().getTime();
     // let nextDate = new Date().getTime() + second;
     let onBreakVariable = onBreak;
-
-    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
 
     // IF timer is off then...
     if (!timerOn) {
@@ -102,10 +100,14 @@ const App = () => {
       localStorage.setItem("interval-id", interval);
     }
 
+    if (timerOn) clearInterval(localStorage.getItem("interval-id"));
+
     setTimerOn(!timerOn);
   };
 
   const resetTime = () => {
+    alarm.current.pause();
+    alarm.current.currentTime = 0;
     if (timerOn) clearInterval(localStorage.getItem("interval-id"));
 
     setOnBreak(false);
@@ -125,7 +127,6 @@ const App = () => {
             changeTime={changeTime}
             type={"break"}
             time={breakTime}
-            formatTime={formatTime}
             formatLengthTimes={formatLengthTimes}
           />
           <Length
@@ -134,7 +135,6 @@ const App = () => {
             changeTime={changeTime}
             type={"session"}
             time={sessionTime}
-            formatTime={formatTime}
             formatLengthTimes={formatLengthTimes}
           />
         </div>
